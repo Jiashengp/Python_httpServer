@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Manage Local Data Source With Grid</title>
+<meta charset="utf-8" />
+<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+<script src="http://code.gijgo.com/1.0.0/js/gijgo.js"
+	type="text/javascript"></script>
+<link href="http://code.gijgo.com/1.0.0/css/gijgo.css" rel="stylesheet"
+	type="text/css" />
+<link href="http://code.gijgo.com/1.0.0/css/demo.css" rel="stylesheet"
+	type="text/css" />
+</head>
+<body>
+	<div class="gj-margin-top-10">
+		<div class="gj-float-left">
+			<form class="display-inline">
+				<input id="txtQuery" type="text"
+					class="gj-frm-ctrl gj-display-inline-block" />
+				<button id="btnSearch" type="button" class="gj-btn">Search</button>
+				<button id="btnClear" type="button" class="gj-btn">Clear</button>
+			</form>
+		</div>
+		<div class="gj-float-right">
+			<button id="btnAdd" type="button" class="gj-btn">Add New
+				Record</button>
+		</div>
+	</div>
+	<div class="gj-clear-both"></div>
+	<div class="gj-margin-top-10">
+		<table id="grid"></table>
+	</div>
+	<a href="2.html"></a>
+
+	<div id="dialog" class="gj-display-none">
+		<input type="hidden" id="ID" />
+		<form>
+			<div>
+				<label for="Name" class="gj-bold">Name:</label> <input type="text"
+					class="gj-frm-ctrl gj-width-240" id="Name">
+			</div>
+			<div class="gj-margin-top-10">
+				<label for="PlaceOfBirth" class="gj-bold">Place Of Birth:</label> <input
+					type="text" class="gj-frm-ctrl gj-width-240" id="PlaceOfBirth" />
+			</div>
+			<div class="gj-margin-top-10">
+				<button type="button" id="btnSave" class="gj-btn">Save</button>
+				<button type="button" id="btnCancel" class="gj-btn">Cancel</button>
+			</div>
+		</form>
+	</div>
+
+	<script type="text/javascript">
+        $(document).ready(function () {
+        	/* var data; */
+            var grid, dialog;
+            var free_data;
+             $.ajax({
+            	dataType:"json",
+            	type : "get",
+                url : "http://localhost:8080/rest",
+                success : function(data){
+                	mjs(data);
+                }
+            });
+
+            function mjs(data){
+            grid = $('#grid').grid({
+                dataSource: data,
+                columns: [
+                    { field: 'id', width: 32 },
+                    { field: 'name', sortable: true },
+                    { field: 'placeOfBirth', title: 'Place Of Birth', sortable: true },
+                    { width: 50, tmpl: '<a href="#">edit</a>', align: 'center', events: { 'click': Edit } },
+                    { width: 50, tmpl: '<a href="#">delete</a>', align: 'center', events: { 'click': Delete } }
+                ],
+                pager: { limit: 3 }
+            });
+            dialog = $('#dialog').dialog({
+                title: 'Grid',
+                autoOpen: false,
+                resizable: false,
+                modal: true
+            });
+            }
+            function Edit(e) {
+                $('#id').val(e.data.id);
+                $('#name').val(e.data.record.name);
+                $('#placeOfBirth').val(e.data.record.placeOfBirth);
+                $('#dialog').dialog('open');
+            }
+            function Delete(e) {
+                if (confirm('Are you sure?')) {
+                    grid.removeRow(e.data.id - 1);
+                }
+            }
+            function Save() {
+                if ($('#ID').val()) {
+                    var id = parseInt($('#ID').val());
+                    grid.updateRow(id, { 'ID': id, 'Name': $('#Name').val(), 'PlaceOfBirth': $('#PlaceOfBirth').val() });
+                } else {
+                    grid.addRow({ 'ID': grid.count(true) + 1, 'Name': $('#Name').val(), 'PlaceOfBirth': $('#PlaceOfBirth').val() });
+                }
+                dialog.close();
+            }
+            $('#btnAdd').on('click', function () {
+                $('#ID').val('');
+                $('#Name').val('');
+                $('#PlaceOfBirth').val('');
+                $('#dialog').dialog('open');
+            });
+            $('#btnSave').on('click', Save);
+            $('#btnCancel').on('click', function () {
+                dialog.close();
+            });
+            $('#btnSearch').on('click', function () {
+                var query, result;
+                query = $('#txtQuery').val();
+                result = $.grep(data, function (e) {
+                    return e.Name.indexOf(query) > -1 || e.PlaceOfBirth.indexOf(query) > -1;
+                });
+                grid.render(result);
+            });
+            $('#btnClear').on('click', function () {
+                $('#txtQuery').val('');
+                grid.render(data);
+            });
+
+        });
+    </script>
+</body>
+</html>
