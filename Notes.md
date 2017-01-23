@@ -30,19 +30,7 @@ When client is brower,if want to response data to get a static web,must to add M
 connection.close()
 ```
 Formally,when server start up,we can't close the connection,always to monitor client request.
-<<<<<<< HEAD
 
-efeefnejfnekfn
-ehfehfehfie
-meijiasheng1234
-abccdcsdcsd
-
-erfegergerg
-
-fdf bdfbdf
-
-dbdfbdfbdfb
-=======
 ### Some need to take care
 #### 1. When brower finined visit Server,then send a acquiescent request to Server(GET /favicon.ico HTTP/1.1)
 #### 2. GET request usually to get resourse,POST usually to update resourse. And GET only commit 1024 byte data,but POST hava no limit
@@ -62,5 +50,3 @@ def getFileSize(fileobject):
 #
 ```
 
-
->>>>>>> Add a edition0.4 support js,css,img...,
